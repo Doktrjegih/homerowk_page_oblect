@@ -1,6 +1,7 @@
 import random
 import string
 
+import allure
 import pytest
 from selenium import webdriver
 
@@ -9,13 +10,16 @@ from pages.navigation.navigation_locators import Pages
 from pages.page_register.register_page import RegisterPage
 
 
+@allure.parent_suite("Регистрация")
+@allure.suite("Проверки страницы регистрации")
+@allure.title("Проверка регистрации пользователя")
 @pytest.mark.usefixtures("open_opencart")
 def test_create_user(driver: webdriver):
     register = RegisterPage(driver)
     navigation = Navigation(driver)
 
     letters = string.ascii_lowercase
-    rand_string = ''.join(random.choice(letters) for _ in range(10))
+    rand_string = "".join(random.choice(letters) for _ in range(10))
 
     navigation.goto_page(Pages.REGISTER)
     register.create_user(

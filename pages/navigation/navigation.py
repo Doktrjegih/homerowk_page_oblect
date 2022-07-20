@@ -1,14 +1,11 @@
-from selenium import webdriver
+import allure
 
 from pages.base_page import BasePage
 from pages.navigation.navigation_locators import NavigationLocators
 
 
 class Navigation(BasePage):
-    def __init__(self, driver: webdriver):
-        super().__init__(driver)
-        self._driver = driver
-
+    @allure.step("Перейти на страницу: {page_name}")
     def goto_page(self, page_name):
         if page_name == "Components":
             self.click(NavigationLocators.COMPONENTS_MENU)

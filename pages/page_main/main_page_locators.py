@@ -9,7 +9,9 @@ class MainPageLocators:
     SHOP_CART: str = '//button[@data-loading-text="Loading..."]'
     NAVIGATION_BAR: str = '//nav[@id="menu"]'
 
-    CURRENCY: str = '//strong/following-sibling::span'
+    CURRENCY: str = "//strong/following-sibling::span"
     EURO: str = '//button[@name="EUR"]'
     DOLLARS: str = '//button[@name="USD"]'
+    GBP: str = '//button[@name="GBP"]'
+
     FIRST_ITEM_PRICE: str = '//p[@class="price"]'
