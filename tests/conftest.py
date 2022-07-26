@@ -1,7 +1,10 @@
+import datetime
+import logging
 from dataclasses import dataclass
 
 import pytest
 from selenium import webdriver
+from selenium.webdriver.opera.options import Options
 
 from pages.base_page import BasePage
 
@@ -18,26 +21,82 @@ def auth_data(request):
 
 
 def pytest_addoption(parser):
-    parser.addoption("--browser", default="chrome")
-    parser.addoption("--url", default="http://10.20.53.41:8081")
+    parser.addoption("--browser", action="store", default="chrome")
+    parser.addoption("--bv", action="store")
+    parser.addoption("--executor", action="store", default="192.168.1.101")
+    parser.addoption("--log_level", action="store", default="INFO")
+    # parser.addoption("--url", default="http://10.20.53.41:8081")
+    parser.addoption("--url", action="store", default="http://192.168.1.101:8081")
+    parser.addoption("--vnc", action="store_true")
+    parser.addoption("--videos", action="store_true")
+    parser.addoption("--mobile", action="store_true")  # only for chrome
 
 
 @pytest.fixture
 def driver(request):
     browser_name = request.config.getoption("--browser")
+    browser_version = request.config.getoption("--bv")
+    log_level = request.config.getoption("--log_level")
+    executor = request.config.getoption("--executor")
+    vnc = request.config.getoption("--vnc")
+    videos = request.config.getoption("--videos")
+    mobile = request.config.getoption("--mobile")
 
-    if browser_name == "chrome":
-        browser = webdriver.Chrome()
-    elif browser_name == "firefox":
-        browser = webdriver.Firefox()
-    elif browser_name == "opera":
-        browser = webdriver.Opera()
+    logger = logging.getLogger(request.node.name)
+
+    logger.addHandler(logging.FileHandler(f"logs/{request.node.name}.log"))
+    logger.setLevel(level=log_level)
+
+    logger.info(
+        f"=== Test {request.node.name} started at {datetime.datetime.now()} ==="
+    )
+
+    if executor != "local":
+        executor_url = f"http://{executor}:4444/wd/hub"
+
+        caps = {
+            "browserName": browser_name,
+            "browserVersion": browser_version,
+            "selenoid:options": {"enableVNC": vnc, "enableVideo": videos},
+            "goog:chromeOptions": {},
+        }
+
+        if mobile:
+            caps["goog:chromeOptions"]["mobileEmulation"] = {
+                "deviceName": "iPhone 5/SE"
+            }
+
+        options = Options()
+        if browser_name == "opera":
+            options.add_experimental_option("w3c", True)
+
+        browser = webdriver.Remote(
+            command_executor=executor_url, desired_capabilities=caps, options=options
+        )
     else:
-        raise ValueError("Браузер передан неверно")
+        if browser_name == "chrome":
+            browser = webdriver.Chrome()
+        elif browser_name == "firefox":
+            browser = webdriver.Firefox()
+        elif browser_name == "opera":
+            browser = webdriver.Opera()
+        else:
+            raise ValueError("Браузер передан неверно")
+
+    browser.log_level = log_level
+    browser.logger = logger
+
+    logger.info(f"Browser: {browser}")
 
     browser.maximize_window()
-    request.addfinalizer(browser.close)
 
+    def final():
+        browser.quit()
+        logger.info(
+            f"=== Test {request.node.name} finished at {datetime.datetime.now()} ==="
+        )
+
+    request.addfinalizer(final)
     return browser
 
 

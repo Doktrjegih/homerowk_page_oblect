@@ -1,10 +1,11 @@
-import pytest
+import allure
 
 from pages.base_page import BasePage
 from pages.page_register.register_page_locators import RegisterPageLocators
 
 
 class RegisterPage(BasePage):
+    @allure.step("Создать пользователя: {name} с e-mail {email}")
     def create_user(
         self, name: str, last_name: str, email: str, tel: str, password: str
     ):
@@ -18,4 +19,4 @@ class RegisterPage(BasePage):
         self.click(RegisterPageLocators.SUBMIT_BUTTON)
         if self.is_element_present(RegisterPageLocators.SUCCESS_REGISTER):
             return
-        pytest.fail('Пользователь не зарегистрирован')
+        self.fail("Пользователь не зарегистрирован")
