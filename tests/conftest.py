@@ -4,6 +4,7 @@ from dataclasses import dataclass
 
 import pytest
 from selenium import webdriver
+from selenium.webdriver import ChromeOptions
 from selenium.webdriver.opera.options import Options
 
 from pages.base_page import BasePage
@@ -30,6 +31,7 @@ def pytest_addoption(parser):
     parser.addoption("--vnc", action="store_true")
     parser.addoption("--videos", action="store_true")
     parser.addoption("--mobile", action="store_true")  # only for chrome
+    parser.addoption("--headless", action="store_true", default=False)
 
 
 @pytest.fixture
@@ -41,6 +43,7 @@ def driver(request):
     vnc = request.config.getoption("--vnc")
     videos = request.config.getoption("--videos")
     mobile = request.config.getoption("--mobile")
+    headless = request.config.getoption("--headless")
 
     logger = logging.getLogger(request.node.name)
 
@@ -75,6 +78,9 @@ def driver(request):
         )
     else:
         if browser_name == "chrome":
+            options = ChromeOptions()
+            if headless:
+                options.headless = headless
             browser = webdriver.Chrome()
         elif browser_name == "firefox":
             browser = webdriver.Firefox()
