@@ -129,3 +129,5 @@ dmypy.json
 .pyre/
 .idea
 allure-results
+jenkins-agent
+jenkins-agent.pub
