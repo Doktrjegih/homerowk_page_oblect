@@ -3,8 +3,10 @@ from typing import List
 
 import allure
 import pytest
-from selenium.common.exceptions import (ElementClickInterceptedException,
-                                        TimeoutException)
+from selenium.common.exceptions import (
+    ElementClickInterceptedException,
+    TimeoutException,
+)
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC

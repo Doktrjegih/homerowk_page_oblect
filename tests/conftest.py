@@ -18,16 +18,15 @@ class AuthData:
 @pytest.fixture
 def auth_data(request):
     ip = request.config.getoption("url")
-    return AuthData(ip=ip)
+    return AuthData(ip=f"http://{ip}")
 
 
 def pytest_addoption(parser):
     parser.addoption("--browser", action="store", default="chrome")
     parser.addoption("--bv", action="store")
-    parser.addoption("--executor", action="store", default="192.168.1.101")
+    parser.addoption("--executor", action="store", default="192.168.0.110:4444")
     parser.addoption("--log_level", action="store", default="INFO")
-    # parser.addoption("--url", default="http://10.20.53.41:8081")
-    parser.addoption("--url", action="store", default="http://192.168.1.101:8081")
+    parser.addoption("--url", action="store", default="192.168.0.110:8081")
     parser.addoption("--vnc", action="store_true")
     parser.addoption("--videos", action="store_true")
     parser.addoption("--mobile", action="store_true")  # only for chrome
@@ -44,6 +43,7 @@ def driver(request):
     videos = request.config.getoption("--videos")
     mobile = request.config.getoption("--mobile")
     headless = request.config.getoption("--headless")
+    executor_ip = request.config.getoption("--executor")
 
     logger = logging.getLogger(request.node.name)
 
@@ -55,8 +55,6 @@ def driver(request):
     )
 
     if executor != "local":
-        executor_url = f"http://{executor}:4444/wd/hub"
-
         caps = {
             "browserName": browser_name,
             "browserVersion": browser_version,
@@ -74,7 +72,9 @@ def driver(request):
             options.add_experimental_option("w3c", True)
 
         browser = webdriver.Remote(
-            command_executor=executor_url, desired_capabilities=caps, options=options
+            command_executor=f"http://{executor_ip}/wd/hub",
+            desired_capabilities=caps,
+            options=options,
         )
     else:
         if browser_name == "chrome":
