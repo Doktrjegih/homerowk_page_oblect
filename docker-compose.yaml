@@ -1,0 +1,26 @@
+# docker-compose.yaml
+version: '3.8'
+services:
+  jenkins:
+    image: jenkins/jenkins:lts-jdk11
+    privileged: true
+    user: root
+    ports:
+     - 8080:8080
+     - 50000:50000
+    container_name: jenkins
+    volumes:
+     - /home/${USER}/jenkins_compose/jenkins_configuration:/var/jenkins_home
+     - /var/run/docker.sock:/var/run/docker.sock
+  agent:
+    image: jenkins/ssh-agent:jdk11
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+    privileged: true
+    user: root
+    container_name: agent
+    expose:
+      - 22
+    environment:
+      - JENKINS_AGENT_SSH_PUBKEY=ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDWSTdbY95wJKuFjpQ8WO/4I63jpgewDXE5E/K49aBxpz2PPhOzelgrwUyGkFO58gZ335zcjwlAlxrOIat1E+Llb6bR1H9vPHCcFYmqXuUZiGQIpjwBGJyqX09K4C3rgk3ozQCSwKyRBOSq2K78lDeDrblEyx9xq631rV9JLAlCO6MioH9st3RsuAnlcPr3T0g2Mw8IldHBJ8Jvk8Bdc9gn4rns6ogZqXsQ4Un+7iFKH5E9WCkZ/T9RGyzjqeCGju+npD36rbY5UfFOKTWw04btXrKZ5emGHD4TQOvMNLoNwP4zpN/MQf1ReIKTBumaPrkvqc+ScrFfT4ETxluIeSYMxbUYDX+jmJI7TZ7E4JFfE/3BNgVhywsUS2bm4VLhE1SiJ8Fwcqlfm0YhVflVM8J9cOdt0t01RcztLIyXXF8pZ/6YiOrHN55cpcZL9DeKtrMA1pfdoSf2YLRTiRvozxk3g5PrJZ+xS7+EfwLIXUNI/BWh/CuAqSsMH1EOLo5+cgE= doktrjegih@job-truepc
