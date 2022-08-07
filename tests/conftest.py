@@ -43,6 +43,7 @@ def driver(request):
     videos = request.config.getoption("--videos")
     mobile = request.config.getoption("--mobile")
     headless = request.config.getoption("--headless")
+
     executor_ip = request.config.getoption("--executor")
 
     logger = logging.getLogger(request.node.name)
